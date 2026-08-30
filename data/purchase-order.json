@@ -1,16 +1,18 @@
 [
   {
-    "materialId": "lindinium",
-    "name": "Lindinium",
-    "idItem": 5927,
+    "materialId": "taranite",
+    "name": "Taranite",
+    "idItem": 5980,
+    "idCategory": 36,
     "unitBasis": "scu",
-    "quality": 954,
+    "quality": 957,
     "qty": 0.6
   },
   {
     "materialId": "hephaestanite",
     "name": "Hephaestanite",
     "idItem": 5910,
+    "idCategory": 36,
     "unitBasis": "scu",
     "quality": 975,
     "qty": 0.6
@@ -19,16 +21,18 @@
     "materialId": "iron",
     "name": "Iron",
     "idItem": 5918,
+    "idCategory": 36,
     "unitBasis": "scu",
     "quality": 970,
     "qty": 0.6
   },
   {
-    "materialId": "taranite",
-    "name": "Taranite",
-    "idItem": 5980,
+    "materialId": "lindinium",
+    "name": "Lindinium",
+    "idItem": 5927,
+    "idCategory": 36,
     "unitBasis": "scu",
-    "quality": 957,
+    "quality": 954,
     "qty": 0.6
   }
 ]
