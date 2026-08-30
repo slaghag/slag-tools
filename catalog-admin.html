@@ -385,7 +385,15 @@ function attachHandlers(){
     el.onclick = async ()=>{
       const idItem = Number(el.dataset.itemId), name = el.dataset.itemName;
       if(materials.some(m=>m.idItem===idItem)){ alert('Already added.'); return; }
-      materials.push({id:uid(), idItem, name, unitBasis:'scu', qualityBands:null, qualityBandsFetchedAt:0});
+      // if there's an unlinked placeholder with a matching name (e.g. from a names-only
+      // seed file), fill it in rather than creating a duplicate row
+      const existing = materials.find(m=>!m.idItem && m.name.toLowerCase()===name.toLowerCase());
+      if(existing){
+        existing.idItem = idItem;
+        existing.name = name; // adopt UEX's canonical spelling/casing
+      } else {
+        materials.push({id:uid(), idItem, name, unitBasis:'scu', qualityBands:null, qualityBandsFetchedAt:0});
+      }
       addMaterialSearchQuery = '';
       await saveMaterials(); render();
     };
