@@ -24,6 +24,7 @@
   header .sub{color:var(--text-dim); font-size:11px; text-transform:uppercase; letter-spacing:.14em; margin-top:2px;}
   main{padding:22px; max-width:960px; margin:0 auto;}
   .panel{background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:18px; margin-bottom:16px;}
+  .panel.active-need{border:2px solid var(--orange); background:linear-gradient(180deg, rgba(212,175,55,.10), var(--panel) 40%); box-shadow:0 0 0 1px rgba(212,175,55,.15);}
   .panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;}
   .panel-head h2{margin:0; font-size:17px; text-transform:uppercase;}
   .eyebrow{font-size:11px; color:var(--orange); text-transform:uppercase; letter-spacing:.14em;}
@@ -240,7 +241,7 @@ function renderMiningCard(item){
   }
 
   return `
-  <div class="panel">
+  <div class="panel${item.activeNeed?' active-need':''}">
     <div class="panel-head">
       <h2>${nameHtml}</h2>
       ${item.activeNeed ? `<span class="pill warn">active build need &middot; &ge;Q${item.quality}</span>` : `<span class="pill ok">band 7 &middot; Q${item.quality}</span>`}
@@ -327,6 +328,8 @@ async function renderMining(){
     const b7 = band7Quality(m);
     return b7!=null ? {...m, quality: b7, activeNeed: false} : null;
   }).filter(Boolean);
+  // active needs first -- stable sort keeps original ordering within each group
+  items.sort((a,b)=>(b.activeNeed?1:0)-(a.activeNeed?1:0));
 
   if(!items.length){
     app.innerHTML = `<div class="panel"><div class="empty">No materials have quality bands set yet -- add them in Catalog Admin.</div></div>`;
