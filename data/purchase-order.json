@@ -27,15 +27,6 @@
     "qty": 0.6
   },
   {
-    "materialId": "hadanite",
-    "name": "Hadanite",
-    "idItem": 3992,
-    "idCategory": 87,
-    "unitBasis": "piece",
-    "quality": 959,
-    "qty": 10
-  },
-  {
     "materialId": "lindinium",
     "name": "Lindinium",
     "idItem": 5927,
