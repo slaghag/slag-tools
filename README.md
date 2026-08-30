@@ -1,38 +1,50 @@
 # S.L.A.G. Tools
 ### Stock, Logistics & Acquisition Gateway — Eagle Co. crafting quartermaster tools
 
-A single-file, no-build web tool for planning crafting builds, tracking a shopping
-list, and finding live material prices on UEX — built by/for Eagle Co.
+Three small, single-purpose static HTML tools — no server, no build step, no
+login. Open any of them straight in a browser.
 
-## What's in here
+## The three tools
 
-- **`quartermaster.html`** — the tool itself. Open it in a browser, no server or
-  build step needed. It saves your personal state (build queue, on-hand counts)
-  in your own browser and pulls the shared org catalog from the JSON files below.
-- **`data/materials.json`** — the shared catalog of raw/refined materials the org
-  crafts with. This is what turns a material name into a real UEX item link and a
-  correct price-unit conversion.
-- **`data/craftables.json`** — the shared catalog of things the org crafts, and
-  what materials (and at what quality) each one needs.
+- **`catalog-admin.html`** — private, occasional use. The *only* tool that talks
+  to UEX or the Star Citizen Wiki API. Search UEX for materials, sample their
+  real quality bands, fetch and bake a blueprint's ingredient list, bulk-import
+  your SCMDB "owned blueprints" export. Produces `materials.json` and
+  `craftables.json`, ready to commit.
+- **`builder.html`** — private, daily use. Reads the shared catalog (no live API
+  calls at all), lets you queue up craftables with quality-per-ingredient
+  sliders that snap to real bands, tracks your personal on-hand counts, and
+  exports a `purchase-order.json` for the buyer.
+- **`buyer-board.html`** — public, read-only. Opens straight to current org
+  material needs with live UEX listings and buy links per material. Nothing to
+  configure beyond pointing it at a `purchase-order.json` URL once.
 
-Materials and craftables live in this repo, not in any one person's browser, so
-the whole org sees the same catalog. Personal stuff — your build queue, your
-on-hand counts, how much extra of something you personally need — stays local to
-your own browser and is never written back here automatically. The tool has an
-**Export for shared catalog** button that generates ready-to-commit JSON for
-anything you add locally, if you want to promote it into the shared files.
+## Why the split
+
+Pulling from three different APIs (UEX's item catalog, UEX's live marketplace,
+and the Wiki's blueprint data) inside a tool you open every day added a lot of
+complexity and browser-stored cache for not much benefit, since none of that
+data changes minute-to-minute except live prices. So the API-heavy work is
+isolated to Catalog Admin, run occasionally, and Builder just reads
+well-formed JSON — smaller, faster, and it keeps working even if one of the
+upstream APIs has a bad day.
 
 ## Setting it up
 
-1. Push this repo to GitHub under the Eagle Co. org (or your own account).
-2. Open `quartermaster.html` (locally, or host it — GitHub Pages works fine for
-   a static file like this) and go to **Settings**.
-3. Point the two catalog URLs at this repo's raw file paths, e.g.:
+1. This lives at [github.com/slaghag/slag-tools](https://github.com/slaghag/slag-tools), public — nothing writes back automatically from any of these tools, so someone else opening Builder or Catalog Admin can only mess with their own local browser storage, not the shared files. The only way `materials.json`/`craftables.json`/`purchase-order.json` change is you deliberately exporting and committing.
+2. To get a shareable link for the buyer (rather than a raw file URL), turn on GitHub Pages: repo **Settings → Pages → Source → Deploy from a branch**, pick `main` and `/ (root)`. That serves this repo at `https://slaghag.github.io/slag-tools/`. `index.html` redirects that root URL straight to `buyer-board.html` — there's nothing else worth putting at the root, and this way the one link you'd actually hand to someone just works without them needing to know a filename.
+3. Open `catalog-admin.html`, add your materials and craftables (or bulk-import from SCMDB), and export `materials.json` / `craftables.json` into `data/`. Commit those.
+4. In `builder.html` → Settings, point the catalog URLs at:
    ```
-   https://raw.githubusercontent.com/<org>/slag-tools/main/data/materials.json
-   https://raw.githubusercontent.com/<org>/slag-tools/main/data/craftables.json
+   https://raw.githubusercontent.com/slaghag/slag-tools/main/data/materials.json
+   https://raw.githubusercontent.com/slaghag/slag-tools/main/data/craftables.json
    ```
-4. Hit **Load shared catalog**. From then on it loads automatically.
+   (double-check `main` is actually your default branch name — view either file on GitHub and use its "Raw" button if unsure, that always gives the correct URL.)
+5. In `buyer-board.html`, set `DEFAULT_SOURCE` near the top of the file to:
+   ```
+   https://raw.githubusercontent.com/slaghag/slag-tools/main/data/purchase-order.json
+   ```
+   Builder exports this file — commit it whenever your queue changes and you want the buyer to see the update.
 
 ## Data schema
 
@@ -43,18 +55,23 @@ anything you add locally, if you want to promote it into the shared files.
     "id": "lindinium",
     "idItem": 5927,
     "name": "Lindinium",
-    "unitBasis": "scu"
+    "unitBasis": "scu",
+    "qualityBands": [585, 618, 729, 853, 930, 954, 1000],
+    "qualityBandsFetchedAt": 1788000000000
   }
 ]
 ```
-- `id` — a short, stable, unique slug. Used to link craftables to this material —
-  don't change it once craftables reference it.
-- `idItem` — the UEX catalog item ID (what the tool uses to pull live prices).
-  Find it by searching for the material in the tool, or from a UEX item page URL
-  (`uexcorp.space/items/info?id=####`). `null` if there's no UEX listing for it.
+- `id` — a short, stable, unique slug. Craftables reference materials by this —
+  don't change it once something depends on it.
+- `idItem` — the UEX catalog item ID (Catalog Admin fills this in when you
+  search and pick a material). `null` if there's no UEX listing for it.
 - `unitBasis` — `"scu"` for most raw/refined materials (1 "Unit" listing ==
-  1 SCU), or `"piece"` for things sold as individual items, like gems, where a
-  "Unit" listing is literally one piece.
+  1 SCU), or `"piece"` for things sold as individual items, like gems.
+- `qualityBands` — the real, distinct quality values seen in live UEX listings
+  the last time Catalog Admin sampled it. This is what Builder's sliders snap
+  to. Re-sample occasionally (Catalog Admin → Sample bands) since it can go
+  stale as listings turn over. `null` until sampled at least once, in which
+  case Builder falls back to a generic 8-point scale.
 
 ### `craftables.json`
 ```json
@@ -64,27 +81,35 @@ anything you add locally, if you want to promote it into the shared files.
     "name": "Pulverizer LMG",
     "category": "Weapons",
     "blueprintSlug": "pulverizer-lmg",
-    "materials": [
-      { "materialId": "lindinium", "qty": 0.06, "quality": 900 }
-    ]
+    "ingredients": [
+      {
+        "name": "Lindinium",
+        "slot": "Frame",
+        "quantityScu": 0.06,
+        "quantity": null,
+        "affects": ["Recoil Smoothness", "Recoil Handling", "Recoil Kick"]
+      }
+    ],
+    "ingredientsFetchedAt": 1788000000000
   }
 ]
 ```
-- `materialId` — must match an `id` in `materials.json`.
-- `qty` — amount needed per unit crafted, in the material's own unit basis (SCU
-  or pieces).
-- `quality` — the minimum quality (0–1000) this build calls for that ingredient.
-- `blueprintSlug` — optional, for a future feature: pulling real quality-to-stat
-  scaling data from the Star Citizen Wiki API so the tool can preview how
-  sliding an ingredient's quality changes the finished item's stats, the way
-  SCMDB and SC Craft Tools do. Not wired up yet — the slug alone doesn't cost
-  anything to include now.
+- `blueprintSlug` — from the item's page on `api.star-citizen.wiki/blueprints/<slug>`
+  (sometimes a UUID instead of a readable slug — either works).
+- `ingredients` — baked in by Catalog Admin from the Wiki API: the resolved
+  ingredient list, quantities, which crafting "slot" each occupies, and which
+  stats that slot's quality tunes. Re-bake (Catalog Admin → Bake/refresh) if a
+  patch changes a recipe. Ingredient `name` is matched against `materials.json`
+  by loose name matching at Builder runtime — if a material's name changes,
+  update it in both files together.
+- Quality *targets* aren't stored here — that's your call per build, chosen
+  live in Builder's queue, not an org-wide fixed value.
 
 ## Data sources & attribution
 
 - Live prices and item catalog: [UEX Corporation](https://uexcorp.space)'s public
   API (`api.uexcorp.uk`), community-maintained.
-- Planned stat-scaling data: the [Star Citizen Wiki API](https://api.star-citizen.wiki),
+- Blueprint ingredients and stat data: the [Star Citizen Wiki API](https://api.star-citizen.wiki),
   built on [`StarCitizenWiki/scunpacked-data`](https://github.com/StarCitizenWiki/scunpacked-data),
   a community datamining project. Not affiliated with Cloud Imperium Games.
 
