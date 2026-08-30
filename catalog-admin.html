@@ -153,7 +153,10 @@ async function refreshQualityBands(materialId){
     const qualities = json.status==='ok' ? [...new Set(
       json.data.filter(d=>!d.is_sold_out && (!d.date_expiration || d.date_expiration>now)).map(d=>Number(d.quality)||0)
     )].sort((a,b)=>a-b) : [];
-    m.qualityBands = qualities.length>1 ? qualities : [0,125,250,375,500,625,750,875,1000];
+    // Only ever show real observed values here -- never a generic placeholder scale,
+    // since that would look like real data. If nothing's currently listed, the boxes
+    // just stay empty for manual entry rather than getting filled with a guess.
+    m.qualityBands = qualities.length ? qualities : null;
     m.qualityBandsFetchedAt = Date.now();
     await saveMaterials();
   } catch(e){ console.error('quality band refresh failed', e); }
@@ -284,21 +287,26 @@ function renderLoadPanel(){
 }
 
 function renderMaterialsPanel(){
-  const rows = materials.map(m=>`<tr>
+  const rows = materials.map(m=>{
+    const bands = (m.qualityBands||[]).slice(0,8);
+    while(bands.length<8) bands.push('');
+    const bandInputs = bands.map((v,i)=>`<input type="number" min="0" max="1000" value="${v}" data-band-mat="${m.id}" data-band-idx="${i}" style="width:56px; margin:1px" title="Band ${i+1}">`).join('');
+    return `<tr>
     <td><strong>${esc(m.name)}</strong>${m.idItem?`<br><a class="link mono" style="font-size:11px" href="https://uexcorp.space/items/info?id=${m.idItem}" target="_blank">UEX #${m.idItem}</a>`:'<br><span class="pill warn">no UEX link</span>'}</td>
     <td><select data-unitbasis="${m.id}" style="font-size:12px">
       <option value="scu" ${m.unitBasis!=='piece'?'selected':''}>SCU-based</option>
       <option value="piece" ${m.unitBasis==='piece'?'selected':''}>Piece-based</option>
     </select></td>
-    <td class="mono" style="font-size:12px">
-      ${m.qualityBands ? m.qualityBands.join(', ') : '<span class="muted">not sampled</span>'}
-      ${m.qualityBands ? `<br><span class="muted" style="font-size:10px">${timeAgo(m.qualityBandsFetchedAt)}</span>` : ''}
-    </td>
     <td>
-      ${m.idItem ? `<button class="btn small" data-refresh-quality="${m.id}">${loadingQuality.has(m.id)?'<span class="loader"></span>':'Sample bands'}</button>` : ''}
+      <div style="display:flex; flex-wrap:wrap; gap:2px; max-width:250px">${bandInputs}</div>
+      ${m.qualityBandsFetchedAt ? `<span class="muted" style="font-size:10px">last sampled ${timeAgo(m.qualityBandsFetchedAt)}</span>` : '<span class="muted" style="font-size:10px">type values in directly, or sample to seed them</span>'}
+    </td>
+    <td style="white-space:nowrap">
+      ${m.idItem ? `<button class="btn small" data-refresh-quality="${m.id}">${loadingQuality.has(m.id)?'<span class="loader"></span>':'Sample (seed)'}</button>` : ''}
       <button class="btn small danger" data-delete-material="${m.id}">Delete</button>
     </td>
-  </tr>`).join('') || '';
+  </tr>`;
+  }).join('') || '';
 
   return `
   <div class="panel">
@@ -384,6 +392,23 @@ function attachHandlers(){
   });
   document.querySelectorAll('[data-unitbasis]').forEach(el=>{
     el.onchange = async ()=>{ const m=materials.find(x=>x.id===el.dataset.unitbasis); if(m){m.unitBasis=el.value; await saveMaterials();} };
+  });
+  document.querySelectorAll('[data-band-mat]').forEach(el=>{
+    el.onchange = async ()=>{
+      const matId = el.dataset.bandMat;
+      const m = materials.find(x=>x.id===matId);
+      if(!m) return;
+      const inputs = document.querySelectorAll(`[data-band-mat="${matId}"]`);
+      const values = Array.from(inputs)
+        .map(i=>i.value.trim())
+        .filter(v=>v!=='')
+        .map(Number)
+        .filter(n=>!isNaN(n) && n>=0 && n<=1000);
+      const uniqueSorted = [...new Set(values)].sort((a,b)=>a-b);
+      m.qualityBands = uniqueSorted.length ? uniqueSorted : null;
+      await saveMaterials();
+      render();
+    };
   });
   document.querySelectorAll('[data-refresh-quality]').forEach(el=>{
     el.onclick = ()=>refreshQualityBands(el.dataset.refreshQuality);
