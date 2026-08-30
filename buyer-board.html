@@ -96,13 +96,38 @@ function marketplaceHomeUrl(item){
   return `https://uexcorp.space/marketplace/home/?${params.toString()}`;
 }
 
-async function fetchAveragePrice(idItem, quality){
+async function fetchAveragePrice(idItem, quality, unitBasis){
   const tier = qualityToTier(quality);
   const res = await fetch(`${API_BASE}/marketplace_prices_averages?id_item=${idItem}&quality_tier=${tier}&operation=sell`);
   const json = await res.json();
   if(json.status !== 'ok' || !json.data || !json.data.length) return null;
-  const d = json.data[0];
-  return { price: Number(d.price_avg)||0, unit: d.unit||'unit', listingsCount: Number(d.listings_count)||0 };
+  // Confirmed via live testing: this endpoint silently ignores the operation/unit query
+  // filters and returns every operation+denomination combination it has for this
+  // item+tier (a `buy` record came back despite operation=sell in the URL). We have to
+  // pick the right one client-side rather than trusting data[0].
+  const sellRecords = json.data.filter(d=>d.operation==='sell');
+  if(!sellRecords.length) return null;
+  // Prefer "unit" (matches what the item's own UEX page displays by default, and what
+  // most sellers actually price in) -- fall back to "scu" for scu-basis materials since
+  // we already treat those as equivalent, or just take whatever's there as a last resort.
+  const preferred = unitBasis==='piece' ? ['unit','un'] : ['unit','un','scu'];
+  let d = null;
+  for(const p of preferred){
+    d = sellRecords.find(r=>(r.unit||'').toLowerCase()===p);
+    if(d) break;
+  }
+  if(!d) d = sellRecords[0];
+  // UEX's own averages page states this reflects "trusted participants over the last 30
+  // days" -- price_avg_month is the field matching that stated window. Confirmed
+  // empirically: the "unit" sell record's price_avg_month matched the page's displayed
+  // 17.8M for Iron/tier7/sell exactly.
+  const rawPrice = Number(d.price_avg_month)||0;
+  // Normalize to the same per-SCU-or-piece basis the listings table uses below, so the
+  // two numbers are actually comparable -- a cSCU-denominated average shown next to
+  // SCU-denominated listings would otherwise look ~100x cheaper than it really is.
+  const mult = unitMultiplier(d.unit, unitBasis);
+  if(mult===null) return null; // can't safely normalize this denomination -- don't show a misleading number
+  return { price: rawPrice/mult, unit: unitBasis==='piece'?'piece':'scu', listingsCount: Number(d.listings_count)||0 };
 }
 
 async function fetchTopListings(idItem, minQuality, unitBasis, count){
@@ -196,7 +221,7 @@ async function main(){
     try{
       const [listings, avg] = await Promise.all([
         fetchTopListings(item.idItem, item.quality, item.unitBasis, 3),
-        fetchAveragePrice(item.idItem, item.quality).catch(e=>{ console.error('average price fetch failed', e); return null; })
+        fetchAveragePrice(item.idItem, item.quality, item.unitBasis).catch(e=>{ console.error('average price fetch failed', e); return null; })
       ]);
       holder.innerHTML = renderMaterialCard(item, listings, false, avg);
     } catch(e){
