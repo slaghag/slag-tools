@@ -1,298 +1,705 @@
 [
   {
     "id": "agricium",
-    "idItem": null,
+    "idItem": 5848,
+    "idCategory": 36,
     "name": "Agricium",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      346,
+      588,
+      667,
+      796,
+      852,
+      943,
+      971,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072225851
   },
   {
     "id": "aluminum",
-    "idItem": null,
+    "idItem": 5852,
+    "idCategory": 36,
     "name": "Aluminum",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      318,
+      511,
+      614,
+      783,
+      896,
+      919,
+      953,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072229799
   },
   {
     "id": "aphorite",
-    "idItem": null,
+    "idItem": 3768,
+    "idCategory": 87,
     "name": "Aphorite",
-    "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "unitBasis": "piece",
+    "qualityBands": [
+      348,
+      523,
+      686,
+      717,
+      861,
+      916,
+      975,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072231643
   },
   {
     "id": "aslarite",
-    "idItem": null,
+    "idItem": 5859,
+    "idCategory": 36,
     "name": "Aslarite",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      287,
+      575,
+      602,
+      741,
+      854,
+      927,
+      963,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072235099
   },
   {
     "id": "beradom",
-    "idItem": null,
+    "idItem": 5703,
+    "idCategory": 87,
     "name": "Beradom",
-    "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "unitBasis": "piece",
+    "qualityBands": [
+      287,
+      578,
+      656,
+      723,
+      881,
+      937,
+      969,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072347446
   },
   {
     "id": "beryl",
-    "idItem": null,
+    "idItem": 5865,
+    "idCategory": 36,
     "name": "Beryl",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      324,
+      547,
+      677,
+      717,
+      860,
+      937,
+      955,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072348429
   },
   {
     "id": "bexalite",
-    "idItem": null,
+    "idItem": 5867,
+    "idCategory": 36,
     "name": "Bexalite",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      302,
+      597,
+      632,
+      756,
+      875,
+      941,
+      959,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072349597
   },
   {
     "id": "borase",
-    "idItem": null,
+    "idItem": 5870,
+    "idCategory": 36,
     "name": "Borase",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      359,
+      584,
+      676,
+      743,
+      892,
+      903,
+      976,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072351079
   },
   {
     "id": "carinite",
-    "idItem": null,
+    "idItem": 4741,
+    "idCategory": 87,
     "name": "Carinite",
-    "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "unitBasis": "piece",
+    "qualityBands": [
+      554,
+      647,
+      716,
+      880,
+      909,
+      959,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072356996
   },
   {
     "id": "copper",
-    "idItem": null,
+    "idItem": 5885,
+    "idCategory": 36,
     "name": "Copper",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      359,
+      593,
+      652,
+      742,
+      855,
+      917,
+      958,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072360553
   },
   {
     "id": "corundum",
-    "idItem": null,
+    "idItem": 5887,
+    "idCategory": 36,
     "name": "Corundum",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      309,
+      504,
+      665,
+      793,
+      886,
+      904,
+      971,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072361695
   },
   {
     "id": "dolivine",
-    "idItem": null,
+    "idItem": 3769,
+    "idCategory": 87,
     "name": "Dolivine",
-    "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "unitBasis": "piece",
+    "qualityBands": [
+      304,
+      577,
+      621,
+      743,
+      886,
+      901,
+      957,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072363178
   },
   {
     "id": "feynmaline",
-    "idItem": null,
+    "idItem": 4922,
+    "idCategory": 87,
     "name": "Feynmaline",
-    "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "unitBasis": "piece",
+    "qualityBands": [
+      371,
+      561,
+      682,
+      769,
+      880,
+      906,
+      965,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072364403
   },
   {
     "id": "glacosite",
-    "idItem": null,
+    "idItem": 4924,
+    "idCategory": 87,
     "name": "Glacosite",
-    "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "unitBasis": "piece",
+    "qualityBands": [
+      360,
+      567,
+      678,
+      724,
+      857,
+      916,
+      972,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072365429
   },
   {
     "id": "gold",
-    "idItem": null,
+    "idItem": 5907,
+    "idCategory": 36,
     "name": "Gold",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      264,
+      553,
+      644,
+      786,
+      864,
+      916,
+      959,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072366619
   },
   {
     "id": "hadanite",
-    "idItem": null,
+    "idItem": 3992,
+    "idCategory": 87,
     "name": "Hadanite",
     "unitBasis": "piece",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      274,
+      526,
+      665,
+      762,
+      867,
+      916,
+      959,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072367651
   },
   {
     "id": "hephaestanite",
-    "idItem": null,
+    "idItem": 5910,
+    "idCategory": 36,
     "name": "Hephaestanite",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      330,
+      572,
+      692,
+      758,
+      896,
+      916,
+      975,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072368618
   },
   {
     "id": "iron",
-    "idItem": null,
+    "idItem": 5918,
+    "idCategory": 36,
     "name": "Iron",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      325,
+      521,
+      664,
+      710,
+      874,
+      907,
+      970,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072369709
   },
   {
     "id": "janalite",
-    "idItem": null,
+    "idItem": 4744,
+    "idCategory": 87,
     "name": "Janalite",
-    "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "unitBasis": "piece",
+    "qualityBands": [
+      269,
+      596,
+      632,
+      732,
+      898,
+      926,
+      964,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072371567
   },
   {
     "id": "laranite",
-    "idItem": null,
+    "idItem": 5923,
+    "idCategory": 36,
     "name": "Laranite",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      298,
+      510,
+      698,
+      707,
+      858,
+      910,
+      975,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072372407
   },
   {
     "id": "lindinium",
     "idItem": 5927,
+    "idCategory": 36,
     "name": "Lindinium",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      305,
+      585,
+      618,
+      729,
+      853,
+      930,
+      954,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072373241
   },
   {
     "id": "ouratite",
-    "idItem": null,
+    "idItem": 5943,
+    "idCategory": 36,
     "name": "Ouratite",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      310,
+      523,
+      647,
+      779,
+      860,
+      912,
+      960,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072374482
   },
   {
     "id": "pressurized-ice",
-    "idItem": null,
+    "idItem": 5948,
+    "idCategory": 36,
     "name": "Pressurized Ice",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
-  },
-  {
-    "id": "quantanium",
-    "idItem": null,
-    "name": "Quantanium",
-    "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      322,
+      561,
+      659,
+      714,
+      873,
+      922,
+      966,
+      1000
+    ],
+    "qualityBandsSource": "manual",
+    "qualityBandsFetchedAt": 1788072517891
   },
   {
     "id": "quartz",
-    "idItem": null,
+    "idItem": 5952,
+    "idCategory": 36,
     "name": "Quartz",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      330,
+      522,
+      641,
+      710,
+      899,
+      914,
+      969,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072399666
   },
   {
     "id": "riccite",
-    "idItem": null,
+    "idItem": 5845,
+    "idCategory": 36,
     "name": "Riccite",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      325,
+      525,
+      671,
+      743,
+      870,
+      942,
+      965,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072402076
   },
   {
     "id": "sadaryx",
-    "idItem": null,
+    "idItem": 5704,
+    "idCategory": 87,
     "name": "Sadaryx",
-    "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "unitBasis": "piece",
+    "qualityBands": [
+      258,
+      510,
+      688,
+      797,
+      865,
+      940,
+      971,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072403027
   },
   {
     "id": "saldynium",
-    "idItem": null,
+    "idItem": 4742,
+    "idCategory": 87,
     "name": "Saldynium",
-    "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "unitBasis": "piece",
+    "qualityBands": [
+      301,
+      575,
+      674,
+      757,
+      861,
+      938,
+      955,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072404148
   },
   {
     "id": "savrilium",
-    "idItem": null,
+    "idItem": 5846,
+    "idCategory": 36,
     "name": "Savrilium",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      322,
+      580,
+      636,
+      776,
+      878,
+      905,
+      967,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072405238
   },
   {
     "id": "silicon",
-    "idItem": null,
+    "idItem": 5972,
+    "idCategory": 36,
     "name": "Silicon",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      310,
+      510,
+      672,
+      782,
+      889,
+      926,
+      968,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072406002
   },
   {
     "id": "stileron",
-    "idItem": null,
+    "idItem": 5843,
+    "idCategory": 36,
     "name": "Stileron",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      330,
+      517,
+      681,
+      747,
+      874,
+      947,
+      972,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072406662
   },
   {
     "id": "taranite",
-    "idItem": null,
+    "idItem": 5980,
+    "idCategory": 36,
     "name": "Taranite",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      310,
+      525,
+      646,
+      718,
+      853,
+      925,
+      957,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072407902
   },
   {
     "id": "tin",
-    "idItem": null,
+    "idItem": 5985,
+    "idCategory": 36,
     "name": "Tin",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      340,
+      537,
+      664,
+      704,
+      880,
+      940,
+      964,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072408519
   },
   {
     "id": "titanium",
-    "idItem": null,
+    "idItem": 5987,
+    "idCategory": 36,
     "name": "Titanium",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      295,
+      516,
+      622,
+      784,
+      866,
+      916,
+      959,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072409195
   },
   {
     "id": "torite",
-    "idItem": null,
+    "idItem": 5989,
+    "idCategory": 36,
     "name": "Torite",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      262,
+      528,
+      661,
+      785,
+      873,
+      944,
+      951,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072410405
   },
   {
     "id": "tungsten",
-    "idItem": null,
+    "idItem": 5992,
+    "idCategory": 36,
     "name": "Tungsten",
     "unitBasis": "scu",
-    "qualityBands": null,
-    "qualityBandsFetchedAt": 0
+    "qualityBands": [
+      363,
+      530,
+      662,
+      787,
+      858,
+      902,
+      964,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788072411171
   },
   {
     "id": "yormandi-eye",
     "idItem": null,
+    "idCategory": null,
     "name": "Yormandi Eye",
+    "unitBasis": "piece",
+    "qualityBands": null,
+    "qualityBandsSource": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "fe10972c-a402-4560-9497-31898fbb0999",
+    "idItem": 4745,
+    "idCategory": 36,
+    "name": "Quantainium",
+    "unitBasis": "scu",
+    "qualityBands": [
+      344,
+      514,
+      669,
+      762,
+      852,
+      901,
+      974,
+      1000
+    ],
+    "qualityBandsSource": "gamedata",
+    "qualityBandsFetchedAt": 1788074096255
+  },
+  {
+    "id": "quantanium",
+    "idItem": null,
+    "idCategory": null,
+    "name": "Quantanium",
     "unitBasis": "scu",
     "qualityBands": null,
+    "qualityBandsSource": null,
     "qualityBandsFetchedAt": 0
   }
 ]
