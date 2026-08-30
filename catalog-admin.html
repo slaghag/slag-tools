@@ -68,6 +68,7 @@
 
 <script>
 const UEX_API_BASE = 'https://api.uexcorp.uk/2.0';
+const SCUNPACKED_RESOURCES_URL = 'https://raw.githubusercontent.com/StarCitizenWiki/scunpacked-data/master/resources/resources.json';
 const WIKI_API_BASE = 'https://api.star-citizen.wiki/api';
 const DEFAULT_CATEGORIES = [{id:36, label:'Commodities'}, {id:87, label:'Harvestables'}];
 const CATALOG_TTL_MS = 24*60*60*1000;
@@ -82,6 +83,8 @@ let loadingCategoryItems = false;
 let loadingQuality = new Set();
 let loadingIngredients = new Set();
 let addMaterialSearchQuery = '';
+let bulkBandsDraft = '';
+let bulkBandsResult = null;
 let loadUrls = {materials:'', craftables:''};
 let scmdbBusy = null; // {stage, loaded, total} while running an import
 let scmdbResult = null;
@@ -141,25 +144,67 @@ function searchCatalog(q){
   return allCatalogItems().filter(i=>i.name.toLowerCase().includes(n)).slice(0,15);
 }
 
-/* ---------------- UEX: quality band sampling ---------------- */
+/* ---------------- Game-data quality bands (authoritative -- from scunpacked-data) ---------------- */
+let scunpackedResourcesCache = null; // in-memory only: ~9.5MB, well over window.storage's 5MB cap, so this is refetched once per session rather than persisted
+let loadingScunpackedResources = false;
+
+async function ensureScunpackedResourcesLoaded(force){
+  if(scunpackedResourcesCache && !force) return scunpackedResourcesCache;
+  loadingScunpackedResources = true; render();
+  try{
+    const res = await fetch(SCUNPACKED_RESOURCES_URL);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    scunpackedResourcesCache = await res.json();
+  } catch(e){
+    console.error('scunpacked-data resources.json fetch failed', e);
+    scunpackedResourcesCache = null;
+  }
+  loadingScunpackedResources = false; render();
+  return scunpackedResourcesCache;
+}
+
+// Recursively walk the game-data structure collecting resource-quantization entries
+// whose Key/Name matches the search term. Same logic validated in data-explorer.html.
+function findResourceEntries(node, term, results, seen){
+  if(node===null || typeof node!=='object') return;
+  if(Array.isArray(node)){ node.forEach(child=>findResourceEntries(child, term, results, seen)); return; }
+  const key = (node.Key||''), name = (node.Name||'');
+  if((key.toLowerCase().includes(term) || name.toLowerCase().includes(term)) && Array.isArray(node.QualityQuantization)){
+    const range = node.QualityRange || {};
+    const sig = `${range.BaseMin}-${range.BaseMax}:${node.QualityQuantization.join(',')}`;
+    if(!seen.has(sig)){ seen.add(sig); results.push({key, name, quantization: node.QualityQuantization}); }
+  }
+  Object.values(node).forEach(v=>findResourceEntries(v, term, results, seen));
+}
+
+function bandsFromGameData(materialName){
+  if(!scunpackedResourcesCache) return null;
+  const results = [];
+  findResourceEntries(scunpackedResourcesCache, materialName.toLowerCase(), results, new Set());
+  if(!results.length) return null;
+  return [...new Set(results.flatMap(r=>r.quantization))].sort((a,b)=>a-b);
+}
+
+/* ---------------- quality band sampling: game data only, no live UEX fallback (see refreshQualityBands) ---------------- */
 async function refreshQualityBands(materialId){
   const m = materials.find(x=>x.id===materialId);
-  if(!m || !m.idItem) return;
+  if(!m) return;
   loadingQuality.add(materialId); render();
   try{
-    const res = await fetch(`${UEX_API_BASE}/marketplace_listings?id_item=${m.idItem}&operation=sell`);
-    const json = await res.json();
-    const now = Date.now()/1000;
-    const qualities = json.status==='ok' ? [...new Set(
-      json.data.filter(d=>!d.is_sold_out && (!d.date_expiration || d.date_expiration>now)).map(d=>Number(d.quality)||0)
-    )].sort((a,b)=>a-b) : [];
-    // Only ever show real observed values here -- never a generic placeholder scale,
-    // since that would look like real data. If nothing's currently listed, the boxes
-    // just stay empty for manual entry rather than getting filled with a guess.
-    m.qualityBands = qualities.length ? qualities : null;
-    m.qualityBandsFetchedAt = Date.now();
-    await saveMaterials();
-  } catch(e){ console.error('quality band refresh failed', e); }
+    await ensureScunpackedResourcesLoaded(false);
+    const gameDataBands = bandsFromGameData(m.name);
+    if(gameDataBands && gameDataBands.length){
+      m.qualityBands = gameDataBands;
+      m.qualityBandsSource = 'gamedata';
+      m.qualityBandsFetchedAt = Date.now();
+      await saveMaterials();
+    } else {
+      alert(`No match found in game data for "${m.name}". Try enter bands manually or via bulk-paste instead -- there's no live-market fallback here on purpose, since listings can include non-craftable or bogus quality values that shouldn't end up in a fixed reference file.`);
+    }
+  } catch(e){
+    console.error('quality band sample failed', e);
+    alert('Could not load game data: '+e.message);
+  }
   loadingQuality.delete(materialId); render();
 }
 
@@ -299,10 +344,10 @@ function renderMaterialsPanel(){
     </select></td>
     <td>
       <div style="display:flex; flex-wrap:wrap; gap:2px; max-width:250px">${bandInputs}</div>
-      ${m.qualityBandsFetchedAt ? `<span class="muted" style="font-size:10px">last sampled ${timeAgo(m.qualityBandsFetchedAt)}</span>` : '<span class="muted" style="font-size:10px">type values in directly, or sample to seed them</span>'}
+      ${m.qualityBandsFetchedAt ? `<span class="muted" style="font-size:10px">${m.qualityBandsSource==='gamedata'?'from game data':'manually set'} &middot; ${timeAgo(m.qualityBandsFetchedAt)}</span>` : '<span class="muted" style="font-size:10px">type values in directly, or sample from game data to seed them</span>'}
     </td>
     <td style="white-space:nowrap">
-      ${m.idItem ? `<button class="btn small" data-refresh-quality="${m.id}">${loadingQuality.has(m.id)?'<span class="loader"></span>':'Sample (seed)'}</button>` : ''}
+      <button class="btn small" data-refresh-quality="${m.id}">${loadingQuality.has(m.id)?'<span class="loader"></span>':'Sample (game data)'}</button>
       <button class="btn small danger" data-delete-material="${m.id}">Delete</button>
     </td>
   </tr>`;
@@ -325,6 +370,21 @@ function renderMaterialsPanel(){
       <button class="btn small" id="reloadCategoriesBtn">Reload UEX categories</button>
       ${categories.map(c=>`<span class="muted mono" style="font-size:11px">${esc(c.label)}: ${itemCatalog[c.id]?itemCatalog[c.id].items.length:0}</span>`).join(' &middot; ')}
     </div>
+    <hr class="divider">
+    <div class="eyebrow">Bulk-paste quality bands</div>
+    <div class="muted" style="font-size:12px; margin-bottom:8px">
+      One material per line: <span class="mono">Name: b1,b2,b3,...</span> &mdash; matches by name against materials already in the list below (case-insensitive). Handy after a round of digging through Data Source Explorer.
+    </div>
+    <textarea id="bulkBandsInput" rows="5" style="width:100%; font-family:monospace; font-size:12px" placeholder="Lindinium: 305,585,618,729,853,930,954,1000
+Iron: 250,400,520,650,...
+Gold: 300,...">${esc(bulkBandsDraft)}</textarea>
+    <div class="row-flex" style="margin-top:8px">
+      <button class="btn primary" id="applyBulkBandsBtn">Apply</button>
+    </div>
+    ${bulkBandsResult ? `<div class="muted" style="font-size:12px; margin-top:8px">
+      Applied to ${bulkBandsResult.matched.length}: ${bulkBandsResult.matched.map(esc).join(', ')||'&mdash;'}
+      ${bulkBandsResult.unmatched.length ? `<br><span class="pill warn">No matching material for: ${bulkBandsResult.unmatched.map(esc).join(', ')}</span>` : ''}
+    </div>` : ''}
     <hr class="divider">
     ${materials.length ? `<table><thead><tr><th>Material</th><th>Unit basis</th><th>Quality bands</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="empty">No materials yet.</div>'}
   </div>`;
@@ -414,6 +474,8 @@ function attachHandlers(){
         .filter(n=>!isNaN(n) && n>=0 && n<=1000);
       const uniqueSorted = [...new Set(values)].sort((a,b)=>a-b);
       m.qualityBands = uniqueSorted.length ? uniqueSorted : null;
+      m.qualityBandsSource = uniqueSorted.length ? 'manual' : null;
+      m.qualityBandsFetchedAt = uniqueSorted.length ? Date.now() : 0;
       await saveMaterials();
       render();
     };
@@ -421,6 +483,29 @@ function attachHandlers(){
   document.querySelectorAll('[data-refresh-quality]').forEach(el=>{
     el.onclick = ()=>refreshQualityBands(el.dataset.refreshQuality);
   });
+  const applyBulkBandsBtn = document.getElementById('applyBulkBandsBtn');
+  if(applyBulkBandsBtn) applyBulkBandsBtn.onclick = async ()=>{
+    const text = document.getElementById('bulkBandsInput').value;
+    bulkBandsDraft = text;
+    const matched = [], unmatched = [];
+    text.split('\n').map(l=>l.trim()).filter(Boolean).forEach(line=>{
+      const idx = line.indexOf(':');
+      if(idx===-1){ unmatched.push(line); return; }
+      const name = line.slice(0, idx).trim();
+      const nums = line.slice(idx+1).split(',')
+        .map(s=>s.trim()).filter(s=>s!=='')
+        .map(Number).filter(n=>!isNaN(n) && n>=0 && n<=1000);
+      const m = materials.find(x=>x.name.toLowerCase()===name.toLowerCase());
+      if(!m){ unmatched.push(name); return; }
+      const uniqueSorted = [...new Set(nums)].sort((a,b)=>a-b);
+      if(uniqueSorted.length){ m.qualityBands = uniqueSorted; m.qualityBandsSource = 'manual'; m.qualityBandsFetchedAt = Date.now(); matched.push(m.name); }
+      else { unmatched.push(name+' (no valid numbers)'); }
+    });
+    await saveMaterials();
+    bulkBandsResult = {matched, unmatched};
+    bulkBandsDraft = '';
+    render();
+  };
   document.querySelectorAll('[data-delete-material]').forEach(el=>{
     el.onclick = async ()=>{ materials = materials.filter(m=>m.id!==el.dataset.deleteMaterial); await saveMaterials(); render(); };
   });
@@ -429,7 +514,7 @@ function attachHandlers(){
   const exportMaterialsBtn = document.getElementById('exportMaterialsBtn');
   if(exportMaterialsBtn) exportMaterialsBtn.onclick = ()=>downloadJson(materials.map(m=>({
     id:m.id, idItem:m.idItem, name:m.name, unitBasis:m.unitBasis||'scu',
-    qualityBands:m.qualityBands||null, qualityBandsFetchedAt:m.qualityBandsFetchedAt||0
+    qualityBands:m.qualityBands||null, qualityBandsSource:m.qualityBandsSource||null, qualityBandsFetchedAt:m.qualityBandsFetchedAt||0
   })), 'materials.json');
 
   const addCraftableBtn = document.getElementById('addCraftableBtn');
