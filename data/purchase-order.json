@@ -1,0 +1,26 @@
+[
+  {
+    "materialId": "lindinium",
+    "name": "Lindinium",
+    "idItem": 5927,
+    "unitBasis": "scu",
+    "quality": 954,
+    "qty": 0.3
+  },
+  {
+    "materialId": "hephaestanite",
+    "name": "Hephaestanite",
+    "idItem": null,
+    "unitBasis": "scu",
+    "quality": 975,
+    "qty": 0.2
+  },
+  {
+    "materialId": "iron",
+    "name": "Iron",
+    "idItem": null,
+    "unitBasis": "scu",
+    "quality": 970,
+    "qty": 0.15
+  }
+]
