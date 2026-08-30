@@ -13,7 +13,7 @@
     "idItem": 5910,
     "unitBasis": "scu",
     "quality": 975,
-    "qty": 0.42
+    "qty": 0.6
   },
   {
     "materialId": "iron",
@@ -21,7 +21,7 @@
     "idItem": 5918,
     "unitBasis": "scu",
     "quality": 970,
-    "qty": 0.33
+    "qty": 0.6
   },
   {
     "materialId": "taranite",
@@ -29,6 +29,6 @@
     "idItem": 5980,
     "unitBasis": "scu",
     "quality": 957,
-    "qty": 0.06
+    "qty": 0.6
   }
 ]
