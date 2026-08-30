@@ -265,13 +265,28 @@ function renderMaterialsTab(){
 }
 
 /* ---------------- SETTINGS TAB ---------------- */
+const EAGLE_CO_URLS = {
+  materials: 'https://raw.githubusercontent.com/slaghag/slag-tools/main/data/materials.json',
+  craftables: 'https://raw.githubusercontent.com/slaghag/slag-tools/main/data/craftables.json'
+};
+
 function renderSettingsTab(){
   return `
   <div class="panel">
     <div class="panel-head"><h2>Shared Catalog</h2></div>
     <div class="muted" style="font-size:12px; margin-bottom:12px">Point these at your org's GitHub-hosted materials.json and craftables.json. Everything about what a material links to, its unit basis, quality bands, and craftable ingredient lists is maintained in Catalog Admin and lives in these files &mdash; Builder only reads them.</div>
-    <label class="f">materials.json URL<input id="matUrlInput" style="width:100%" value="${esc(catalogUrls.materials||'')}"></label>
-    <label class="f" style="margin-top:8px">craftables.json URL<input id="craftUrlInput" style="width:100%" value="${esc(catalogUrls.craftables||'')}"></label>
+    <label class="f">materials.json URL
+      <div class="row-flex" style="align-items:center; gap:6px">
+        <input id="matUrlInput" style="flex:1" value="${esc(catalogUrls.materials||'')}">
+        <button class="btn small" id="fillMatUrlBtn" type="button">Use Eagle Co. repo</button>
+      </div>
+    </label>
+    <label class="f" style="margin-top:8px">craftables.json URL
+      <div class="row-flex" style="align-items:center; gap:6px">
+        <input id="craftUrlInput" style="flex:1" value="${esc(catalogUrls.craftables||'')}">
+        <button class="btn small" id="fillCraftUrlBtn" type="button">Use Eagle Co. repo</button>
+      </div>
+    </label>
     <div class="row-flex" style="margin-top:10px">
       <button class="btn primary" id="saveCatalogUrlsBtn">${loadingCatalog?'<span class="loader"></span> Loading…':'Save & load'}</button>
       <span class="muted mono" style="font-size:12px">${sharedMaterials.length} materials, ${sharedCraftables.length} craftables loaded</span>
@@ -342,6 +357,7 @@ function attachHandlers(){
       const stillNeed = Math.max(0, n.qty - onHand);
       return {
         materialId: n.materialId, name: mat?mat.name:n.materialName, idItem: mat?mat.idItem:null,
+        idCategory: mat?(mat.idCategory||null):null,
         unitBasis: mat?(mat.unitBasis||'scu'):'scu', quality: n.quality, qty: Math.round(stillNeed*1000)/1000
       };
     }).filter(item=>item.qty>0);
@@ -360,6 +376,10 @@ function attachHandlers(){
     await saveCatalogUrls();
     await loadSharedCatalog(true);
   };
+  const fillMatUrlBtn = document.getElementById('fillMatUrlBtn');
+  if(fillMatUrlBtn) fillMatUrlBtn.onclick = ()=>{ document.getElementById('matUrlInput').value = EAGLE_CO_URLS.materials; };
+  const fillCraftUrlBtn = document.getElementById('fillCraftUrlBtn');
+  if(fillCraftUrlBtn) fillCraftUrlBtn.onclick = ()=>{ document.getElementById('craftUrlInput').value = EAGLE_CO_URLS.craftables; };
 }
 
 /* ---------------- tabs / backup ---------------- */

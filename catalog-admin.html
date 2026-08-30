@@ -123,7 +123,7 @@ async function ensureCategoryLoaded(idCategory, force){
   const cached = itemCatalog[idCategory];
   if(!force && cached && (Date.now()-cached.fetchedAt)<CATALOG_TTL_MS) return cached.items;
   const data = await uexGet('/items', {id_category:idCategory});
-  const items = data.map(d=>({idItem:d.id, name:d.name}));
+  const items = data.map(d=>({idItem:d.id, name:d.name, idCategory}));
   itemCatalog[idCategory] = {items, fetchedAt:Date.now()};
   saveItemCatalog();
   return items;
@@ -142,6 +142,24 @@ function searchCatalog(q){
   if(!q||q.length<2) return [];
   const n=q.toLowerCase();
   return allCatalogItems().filter(i=>i.name.toLowerCase().includes(n)).slice(0,15);
+}
+
+// Re-syncs an already-linked material's name/category against the UEX catalog by
+// matching on its existing idItem -- the fix for materials linked before idCategory
+// was tracked, or whose name has since changed on UEX.
+async function refreshMaterialUexLink(materialId){
+  const m = materials.find(x=>x.id===materialId);
+  if(!m || !m.idItem) return;
+  await ensureAllCategoriesLoaded(false);
+  const match = allCatalogItems().find(i=>i.idItem===m.idItem);
+  if(match){
+    m.name = match.name;
+    m.idCategory = match.idCategory;
+    await saveMaterials();
+    render();
+  } else {
+    alert(`UEX item #${m.idItem} wasn't found in any currently-loaded category. Try "Reload UEX categories" below in case it's newer than the cache, or check it's actually in Commodities/Harvestables.`);
+  }
 }
 
 /* ---------------- Game-data quality bands (authoritative -- from scunpacked-data) ---------------- */
@@ -318,13 +336,28 @@ function render(){
   attachHandlers();
 }
 
+const EAGLE_CO_URLS = {
+  materials: 'https://raw.githubusercontent.com/slaghag/slag-tools/main/data/materials.json',
+  craftables: 'https://raw.githubusercontent.com/slaghag/slag-tools/main/data/craftables.json'
+};
+
 function renderLoadPanel(){
   return `
   <div class="panel">
     <div class="panel-head"><h2>Load Existing Repo Files</h2></div>
     <div class="muted" style="font-size:12px; margin-bottom:10px">Optional: pull in your current materials.json/craftables.json to edit and re-export, rather than starting from scratch.</div>
-    <label class="f">materials.json URL<input id="loadMatUrl" style="width:100%" value="${esc(loadUrls.materials)}"></label>
-    <label class="f" style="margin-top:8px">craftables.json URL<input id="loadCraftUrl" style="width:100%" value="${esc(loadUrls.craftables)}"></label>
+    <label class="f">materials.json URL
+      <div class="row-flex" style="align-items:center; gap:6px">
+        <input id="loadMatUrl" style="flex:1" value="${esc(loadUrls.materials)}">
+        <button class="btn small" id="fillMatUrlBtn" type="button">Use Eagle Co. repo</button>
+      </div>
+    </label>
+    <label class="f" style="margin-top:8px">craftables.json URL
+      <div class="row-flex" style="align-items:center; gap:6px">
+        <input id="loadCraftUrl" style="flex:1" value="${esc(loadUrls.craftables)}">
+        <button class="btn small" id="fillCraftUrlBtn" type="button">Use Eagle Co. repo</button>
+      </div>
+    </label>
     <div class="row-flex" style="margin-top:10px">
       <button class="btn primary" id="loadExistingBtn">Load into working draft</button>
     </div>
@@ -337,7 +370,7 @@ function renderMaterialsPanel(){
     while(bands.length<8) bands.push('');
     const bandInputs = bands.map((v,i)=>`<input type="number" min="0" max="1000" value="${v}" data-band-mat="${m.id}" data-band-idx="${i}" style="width:56px; margin:1px" title="Band ${i+1}">`).join('');
     return `<tr>
-    <td><strong>${esc(m.name)}</strong>${m.idItem?`<br><a class="link mono" style="font-size:11px" href="https://uexcorp.space/items/info?id=${m.idItem}" target="_blank">UEX #${m.idItem}</a>`:'<br><span class="pill warn">no UEX link</span>'}</td>
+    <td><strong>${esc(m.name)}</strong>${m.idItem?`<br><a class="link mono" style="font-size:11px" href="https://uexcorp.space/items/info?id=${m.idItem}" target="_blank">UEX #${m.idItem}</a>${m.idCategory?'':' <span class="pill warn" style="font-size:9px">no category cached</span>'}`:'<br><span class="pill warn">no UEX link</span>'}</td>
     <td><select data-unitbasis="${m.id}" style="font-size:12px">
       <option value="scu" ${m.unitBasis!=='piece'?'selected':''}>SCU-based</option>
       <option value="piece" ${m.unitBasis==='piece'?'selected':''}>Piece-based</option>
@@ -348,6 +381,7 @@ function renderMaterialsPanel(){
     </td>
     <td style="white-space:nowrap">
       <button class="btn small" data-refresh-quality="${m.id}">${loadingQuality.has(m.id)?'<span class="loader"></span>':'Sample (game data)'}</button>
+      ${m.idItem ? `<button class="btn small" data-refresh-uexlink="${m.id}">Refresh UEX</button>` : ''}
       <button class="btn small danger" data-delete-material="${m.id}">Delete</button>
     </td>
   </tr>`;
@@ -391,7 +425,7 @@ Gold: 300,...">${esc(bulkBandsDraft)}</textarea>
 }
 function renderSearchResults(results){
   if(!results.length) return `<div class="search-results-list"><div class="muted" style="cursor:default">No matches loaded.</div></div>`;
-  return `<div class="search-results-list">${results.map(r=>`<div data-pick-material data-item-id="${r.idItem}" data-item-name="${esc(r.name)}">${esc(r.name)} <span class="muted mono" style="font-size:11px">#${r.idItem}</span></div>`).join('')}</div>`;
+  return `<div class="search-results-list">${results.map(r=>`<div data-pick-material data-item-id="${r.idItem}" data-item-name="${esc(r.name)}" data-item-category="${r.idCategory}">${esc(r.name)} <span class="muted mono" style="font-size:11px">#${r.idItem}</span></div>`).join('')}</div>`;
 }
 
 function renderCraftablesPanel(){
@@ -438,21 +472,26 @@ function attachHandlers(){
     loadUrls = {materials:document.getElementById('loadMatUrl').value.trim(), craftables:document.getElementById('loadCraftUrl').value.trim()};
     loadExistingFiles();
   };
+  const fillMatUrlBtn = document.getElementById('fillMatUrlBtn');
+  if(fillMatUrlBtn) fillMatUrlBtn.onclick = ()=>{ document.getElementById('loadMatUrl').value = EAGLE_CO_URLS.materials; };
+  const fillCraftUrlBtn = document.getElementById('fillCraftUrlBtn');
+  if(fillCraftUrlBtn) fillCraftUrlBtn.onclick = ()=>{ document.getElementById('loadCraftUrl').value = EAGLE_CO_URLS.craftables; };
 
   const addMaterialSearch = document.getElementById('addMaterialSearch');
   if(addMaterialSearch) addMaterialSearch.oninput = e=>{ addMaterialSearchQuery = e.target.value; render(); const el=document.getElementById('addMaterialSearch'); if(el){el.focus(); el.setSelectionRange(el.value.length, el.value.length);} };
   document.querySelectorAll('[data-pick-material]').forEach(el=>{
     el.onclick = async ()=>{
-      const idItem = Number(el.dataset.itemId), name = el.dataset.itemName;
+      const idItem = Number(el.dataset.itemId), name = el.dataset.itemName, idCategory = Number(el.dataset.itemCategory);
       if(materials.some(m=>m.idItem===idItem)){ alert('Already added.'); return; }
       // if there's an unlinked placeholder with a matching name (e.g. from a names-only
       // seed file), fill it in rather than creating a duplicate row
       const existing = materials.find(m=>!m.idItem && m.name.toLowerCase()===name.toLowerCase());
       if(existing){
         existing.idItem = idItem;
+        existing.idCategory = idCategory;
         existing.name = name; // adopt UEX's canonical spelling/casing
       } else {
-        materials.push({id:uid(), idItem, name, unitBasis:'scu', qualityBands:null, qualityBandsFetchedAt:0});
+        materials.push({id:uid(), idItem, idCategory, name, unitBasis:'scu', qualityBands:null, qualityBandsFetchedAt:0});
       }
       addMaterialSearchQuery = '';
       await saveMaterials(); render();
@@ -482,6 +521,9 @@ function attachHandlers(){
   });
   document.querySelectorAll('[data-refresh-quality]').forEach(el=>{
     el.onclick = ()=>refreshQualityBands(el.dataset.refreshQuality);
+  });
+  document.querySelectorAll('[data-refresh-uexlink]').forEach(el=>{
+    el.onclick = ()=>refreshMaterialUexLink(el.dataset.refreshUexlink);
   });
   const applyBulkBandsBtn = document.getElementById('applyBulkBandsBtn');
   if(applyBulkBandsBtn) applyBulkBandsBtn.onclick = async ()=>{
@@ -513,7 +555,7 @@ function attachHandlers(){
   if(reloadCategoriesBtn) reloadCategoriesBtn.onclick = ()=>ensureAllCategoriesLoaded(true);
   const exportMaterialsBtn = document.getElementById('exportMaterialsBtn');
   if(exportMaterialsBtn) exportMaterialsBtn.onclick = ()=>downloadJson(materials.map(m=>({
-    id:m.id, idItem:m.idItem, name:m.name, unitBasis:m.unitBasis||'scu',
+    id:m.id, idItem:m.idItem, idCategory:m.idCategory||null, name:m.name, unitBasis:m.unitBasis||'scu',
     qualityBands:m.qualityBands||null, qualityBandsSource:m.qualityBandsSource||null, qualityBandsFetchedAt:m.qualityBandsFetchedAt||0
   })), 'materials.json');
 
