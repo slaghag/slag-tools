@@ -5,7 +5,7 @@
     "idItem": 5927,
     "unitBasis": "scu",
     "quality": 954,
-    "qty": 0.3
+    "qty": 0.6
   },
   {
     "materialId": "hephaestanite",
@@ -13,7 +13,7 @@
     "idItem": 5910,
     "unitBasis": "scu",
     "quality": 975,
-    "qty": 0.2
+    "qty": 0.42
   },
   {
     "materialId": "iron",
@@ -21,6 +21,14 @@
     "idItem": 5918,
     "unitBasis": "scu",
     "quality": 970,
-    "qty": 0.15
+    "qty": 0.33
+  },
+  {
+    "materialId": "taranite",
+    "name": "Taranite",
+    "idItem": 5980,
+    "unitBasis": "scu",
+    "quality": 957,
+    "qty": 0.06
   }
 ]
