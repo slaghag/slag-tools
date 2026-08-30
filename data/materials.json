@@ -1,1 +1,298 @@
-
+[
+  {
+    "id": "agricium",
+    "idItem": null,
+    "name": "Agricium",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "aluminum",
+    "idItem": null,
+    "name": "Aluminum",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "aphorite",
+    "idItem": null,
+    "name": "Aphorite",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "aslarite",
+    "idItem": null,
+    "name": "Aslarite",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "beradom",
+    "idItem": null,
+    "name": "Beradom",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "beryl",
+    "idItem": null,
+    "name": "Beryl",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "bexalite",
+    "idItem": null,
+    "name": "Bexalite",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "borase",
+    "idItem": null,
+    "name": "Borase",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "carinite",
+    "idItem": null,
+    "name": "Carinite",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "copper",
+    "idItem": null,
+    "name": "Copper",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "corundum",
+    "idItem": null,
+    "name": "Corundum",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "dolivine",
+    "idItem": null,
+    "name": "Dolivine",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "feynmaline",
+    "idItem": null,
+    "name": "Feynmaline",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "glacosite",
+    "idItem": null,
+    "name": "Glacosite",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "gold",
+    "idItem": null,
+    "name": "Gold",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "hadanite",
+    "idItem": null,
+    "name": "Hadanite",
+    "unitBasis": "piece",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "hephaestanite",
+    "idItem": null,
+    "name": "Hephaestanite",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "iron",
+    "idItem": null,
+    "name": "Iron",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "janalite",
+    "idItem": null,
+    "name": "Janalite",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "laranite",
+    "idItem": null,
+    "name": "Laranite",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "lindinium",
+    "idItem": 5927,
+    "name": "Lindinium",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "ouratite",
+    "idItem": null,
+    "name": "Ouratite",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "pressurized-ice",
+    "idItem": null,
+    "name": "Pressurized Ice",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "quantanium",
+    "idItem": null,
+    "name": "Quantanium",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "quartz",
+    "idItem": null,
+    "name": "Quartz",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "riccite",
+    "idItem": null,
+    "name": "Riccite",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "sadaryx",
+    "idItem": null,
+    "name": "Sadaryx",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "saldynium",
+    "idItem": null,
+    "name": "Saldynium",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "savrilium",
+    "idItem": null,
+    "name": "Savrilium",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "silicon",
+    "idItem": null,
+    "name": "Silicon",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "stileron",
+    "idItem": null,
+    "name": "Stileron",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "taranite",
+    "idItem": null,
+    "name": "Taranite",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "tin",
+    "idItem": null,
+    "name": "Tin",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "titanium",
+    "idItem": null,
+    "name": "Titanium",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "torite",
+    "idItem": null,
+    "name": "Torite",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "tungsten",
+    "idItem": null,
+    "name": "Tungsten",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  },
+  {
+    "id": "yormandi-eye",
+    "idItem": null,
+    "name": "Yormandi Eye",
+    "unitBasis": "scu",
+    "qualityBands": null,
+    "qualityBandsFetchedAt": 0
+  }
+]
