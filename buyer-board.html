@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eagle Co. // Buyer Board</title>
+<title>Eagle Company // Buyer Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -51,7 +51,7 @@
 </head>
 <body>
 <header>
-  <h1>Eagle Co.<span> // </span>Buyer Board</h1>
+  <h1>Eagle Company<span> // </span>Buyer Board</h1>
   <div class="sub">Current material needs &middot; live UEX prices</div>
 </header>
 <nav id="tabs">
@@ -69,6 +69,7 @@ const API_BASE = 'https://api.uexcorp.uk/2.0';
 // params override for one-off testing without editing the file.
 const DEFAULT_SOURCE = 'https://raw.githubusercontent.com/slaghag/slag-tools/main/data/purchase-order.json';
 const MATERIALS_SOURCE = 'https://raw.githubusercontent.com/slaghag/slag-tools/main/data/materials.json';
+const PRICING_SOURCE = 'https://raw.githubusercontent.com/slaghag/slag-tools/main/data/pricing-config.json';
 
 function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function fmtNum(n){ return Number(n||0).toLocaleString(undefined,{maximumFractionDigits:3}); }
@@ -216,19 +217,27 @@ function band7Quality(material){
 function renderMiningCard(item){
   const basisLabel = (item.unitBasis==='piece') ? 'piece' : 'SCU';
   const nameHtml = item.idItem
-    ? `<a class="link" href="${esc(marketplaceHomeUrl(item,'buy'))}" target="_blank" rel="noopener" title="See current WTB listings for this material at this quality or better">${esc(item.name)}</a>`
+    ? `<a class="link" href="${esc(marketplaceHomeUrl(item,'sell'))}" target="_blank" rel="noopener" title="See current sell listings this offer is based on">${esc(item.name)}</a>`
     : esc(item.name);
 
   const hasSetPrice = item.wtbPrice!=null && item.wtbPrice>0;
-  const marketRefHtml = item._avg
-    ? `market avg ${fmtMoney(item._avg.price)} aUEC/${esc(item._avg.unit)} <span class="${item._avg.listingsCount<3?'pill warn':''}" style="font-size:9px">${item._avg.listingsCount} listing${item._avg.listingsCount===1?'':'s'}</span>`
-    : (item._avgErr ? 'no market data at this quality right now' : '<span class="loader"></span>');
+  const sellAvg = item._sellAvg;
+  const calculatedOffer = (!hasSetPrice && sellAvg) ? sellAvg.price * (pricingConfig.buyPercentOfSell/100) : null;
 
-  const offerHtml = hasSetPrice
-    ? `<div><span class="pill ok" style="font-size:10px">Eagle Co. rate</span> <span class="mono" style="font-size:20px; color:var(--orange); font-weight:700; margin-left:6px">${fmtMoney(item.wtbPrice)} aUEC/${basisLabel}</span></div>
-       <div class="muted" style="font-size:11px; margin-top:4px">${marketRefHtml}</div>`
-    : `<div><span class="pill warn" style="font-size:10px">not yet set &mdash; showing market suggestion</span></div>
-       <div class="mono" style="font-size:18px; margin-top:4px">${marketRefHtml}</div>`;
+  const sellRefHtml = sellAvg
+    ? `market sell avg ${fmtMoney(sellAvg.price)} aUEC/${esc(sellAvg.unit)} <span class="${sellAvg.listingsCount<3?'pill warn':''}" style="font-size:9px">${sellAvg.listingsCount} listing${sellAvg.listingsCount===1?'':'s'}</span>`
+    : (item._sellAvgErr ? 'no market data at this quality right now' : '<span class="loader"></span>');
+
+  let offerHtml;
+  if(hasSetPrice){
+    offerHtml = `<div><span class="pill ok" style="font-size:10px">Eagle Company rate (manual)</span> <span class="mono" style="font-size:20px; color:var(--orange); font-weight:700; margin-left:6px">${fmtMoney(item.wtbPrice)} aUEC/${basisLabel}</span></div>
+       <div class="muted" style="font-size:11px; margin-top:4px">${sellRefHtml}</div>`;
+  } else if(calculatedOffer!=null){
+    offerHtml = `<div><span class="pill ok" style="font-size:10px">Eagle Company rate (${pricingConfig.buyPercentOfSell}% of sell avg)</span> <span class="mono" style="font-size:20px; color:var(--orange); font-weight:700; margin-left:6px">${fmtMoney(calculatedOffer)} aUEC/${basisLabel}</span></div>
+       <div class="muted" style="font-size:11px; margin-top:4px">${sellRefHtml}</div>`;
+  } else {
+    offerHtml = `<div>${sellRefHtml}</div>`;
+  }
 
   return `
   <div class="panel">
@@ -253,6 +262,20 @@ async function loadMaterials(){
   }
 }
 
+async function loadPricingConfig(){
+  const params = new URLSearchParams(location.search);
+  const src = params.get('pricingSrc') || PRICING_SOURCE;
+  try{
+    const res = await fetch(src + (src.includes('?')?'&':'?') + '_=' + Date.now());
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    return await res.json();
+  } catch(e){
+    console.error('pricing-config.json load failed (using default 70%)', e);
+    return {buyPercentOfSell: 70};
+  }
+}
+
+let pricingConfig = {buyPercentOfSell: 70};
 let currentTab = 'buylist';
 let orderData = null;
 let materialsData = null;
@@ -286,6 +309,7 @@ async function renderMining(){
   if(!materialsData){
     app.innerHTML = `<div class="panel"><div class="empty"><span class="loader"></span> Loading materials&hellip;</div></div>`;
     materialsData = await loadMaterials();
+    pricingConfig = await loadPricingConfig();
   }
   const linked = materialsData.filter(m=>m.idItem);
   if(!linked.length){
@@ -309,18 +333,18 @@ async function renderMining(){
     return;
   }
 
-  app.innerHTML = `<div class="muted" style="font-size:12px; margin-bottom:14px">Prices here are Eagle Co.'s own standing offer, set in Catalog Admin -- not a live market feed, so one bad or manipulated UEX listing can't move what we actually pay. Live market average shown as reference only. Default view is Band 7 (second-highest known quality) for every tracked material; anything currently needed for an active build switches to that build's specific required quality instead.</div>`
+  app.innerHTML = `<div class="muted" style="font-size:12px; margin-bottom:14px">Eagle Company's buy-back offer -- either a manually-set rate from Catalog Admin, or ${pricingConfig.buyPercentOfSell}% of the live market sell average (deliberately not based on WTB data, which has proven easy for a single listing to distort). Default view is Band 7 (second-highest known quality) for every tracked material; anything currently needed for an active build switches to that build's specific required quality instead.</div>`
     + items.map(item=>`<div id="mine-${item.id}">${renderMiningCard(item)}</div>`).join('')
     + `<div class="refresh-note">Loaded ${new Date().toLocaleString()} &middot; refresh the page for updated prices</div>`;
 
   await Promise.all(items.map(async item=>{
     const holder = document.getElementById('mine-'+item.id);
     try{
-      const avg = await fetchAveragePrice(item.idItem, item.quality, item.unitBasis, 'buy');
-      item._avg = avg; item._avgErr = !avg;
+      const avg = await fetchAveragePrice(item.idItem, item.quality, item.unitBasis, 'sell');
+      item._sellAvg = avg; item._sellAvgErr = !avg;
     } catch(e){
-      console.error('WTB average fetch failed', item.name, e);
-      item._avgErr = true;
+      console.error('sell average fetch failed', item.name, e);
+      item._sellAvgErr = true;
     }
     holder.innerHTML = renderMiningCard(item);
   }));
